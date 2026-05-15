@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Квиз для Ани 🎂</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700;900&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --pk:#FF3C96;--cy:#00DCFF;--yw:#FFD600;--pu:#9B5DE5;--gr:#00C864;
+  --dark:#0D0717;--card:#F8F0FF;--txt:#1A0030;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Nunito',sans-serif;background:var(--dark);min-height:100vh;color:#fff;overflow-x:hidden}
+
+.bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    radial-gradient(circle,rgba(255,60,150,.35) 1.5px,transparent 1.5px),
+    radial-gradient(circle,rgba(0,220,255,.28) 1px,transparent 1px),
+    radial-gradient(circle,rgba(255,220,0,.3) 1px,transparent 1px);
+  background-size:62px 62px,44px 44px,80px 80px;
+  background-position:0 0,14px 22px,36px 8px}
+
+.scene{position:relative;z-index:2;max-width:700px;margin:0 auto;padding:2rem 1.2rem 4rem}
+
+/* ───── SPLASH ───── */
+#splash{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:0;padding:2.5rem 1.2rem}
+.s-tag{display:inline-block;background:var(--yw);color:var(--dark);font-family:'Unbounded',cursive;font-size:.6rem;font-weight:900;letter-spacing:.2em;text-transform:uppercase;padding:.4rem 1.3rem;border-radius:999px;margin-bottom:1.5rem}
+.s-title{font-family:'Unbounded',cursive;font-size:clamp(2.8rem,11vw,5.6rem);font-weight:900;line-height:1.03;margin-bottom:.7rem}
+.s-title .pk{color:var(--pk)}.s-title .cy{color:var(--cy)}.s-title .yw{color:var(--yw)}
+.s-sub{color:rgba(255,255,255,.62);font-weight:700;font-size:clamp(.9rem,2.5vw,1.12rem);margin-bottom:2rem;max-width:460px;line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:.55rem;justify-content:center;margin-bottom:2.4rem}
+.chip{background:rgba(255,255,255,.09);border:1.5px solid rgba(255,255,255,.18);color:#fff;font-size:.82rem;font-weight:700;padding:.36rem 1rem;border-radius:999px}
+.btn-go{font-family:'Unbounded',cursive;font-size:1rem;font-weight:900;padding:1.05rem 3.4rem;border-radius:999px;border:none;cursor:pointer;background:var(--pk);color:#fff;letter-spacing:.05em;transition:transform .14s;box-shadow:0 0 32px rgba(255,60,150,.55)}
+.btn-go:hover{transform:scale(1.06)}
+.btn-go:active{transform:scale(.96)}
+
+/* ───── QUIZ ───── */
+#quiz{display:none}
+.qheader{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;font-size:.82rem;font-weight:700;color:rgba(255,255,255,.55)}
+.pbar-wrap{background:rgba(255,255,255,.1);border-radius:999px;height:8px;margin-bottom:1.5rem;overflow:hidden}
+.pbar{height:100%;border-radius:999px;background:var(--pk);transition:width .4s ease}
+.qcard{background:var(--card);border-radius:24px;padding:1.7rem 1.7rem 1.3rem}
+.cpill{display:inline-block;font-size:.67rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;padding:.3rem .9rem;border-radius:999px;margin-bottom:.95rem}
+.cpill.art{background:rgba(255,122,26,.18);color:#9B3D00}
+.cpill.lit{background:rgba(200,0,80,.14);color:#880040}
+.cpill.arch{background:rgba(0,150,220,.14);color:#005A8C}
+.cpill.fact{background:rgba(0,170,90,.14);color:#005A30}
+.cpill.kino{background:rgba(140,0,220,.14);color:#5C009A}
+.img-box{width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;margin-bottom:1.15rem;background:#E0D0F0;position:relative}
+.img-box img{width:100%;height:100%;object-fit:cover;object-position:center 22%;display:block}
+.img-cap{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.42);color:#fff;font-size:.67rem;font-weight:700;padding:.65rem .75rem .4rem;letter-spacing:.04em}
+.qtxt{font-family:'Unbounded',cursive;font-size:clamp(.9rem,2.3vw,1.07rem);font-weight:700;line-height:1.55;color:var(--txt);margin-bottom:1.35rem}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
+.opt{background:#fff;border:2.5px solid #E4D5F5;border-radius:14px;padding:.88rem .8rem;font-family:'Nunito',sans-serif;font-size:.93rem;font-weight:700;color:var(--txt);cursor:pointer;text-align:left;line-height:1.35;transition:border-color .12s,background .12s,transform .12s;display:flex;align-items:flex-start;gap:8px}
+.opt:hover:not(:disabled){border-color:var(--pu);background:#F3EAFF;transform:translateY(-2px)}
+.opt:disabled{cursor:default;transform:none}
+.opt.ok{background:#E8FFF3;border-color:var(--gr);color:#004D28}
+.opt.bad{background:#FFF0F5;border-color:var(--pk);color:#7A0038}
+.olbl{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:23px;height:23px;border-radius:50%;background:#EDE0FF;color:var(--pu);font-family:'Unbounded',cursive;font-size:.58rem;font-weight:900;margin-top:1px}
+.fb{border-radius:14px;padding:.9rem 1rem;font-size:.87rem;font-weight:700;line-height:1.5;margin-top:.9rem;display:none}
+.fb.ok{background:#E8FFF3;color:#004D28}
+.fb.bad{background:#FFF0F5;color:#7A0038}
+.btn-next{font-family:'Unbounded',cursive;font-size:.82rem;font-weight:900;padding:.85rem 2.5rem;border-radius:999px;border:none;cursor:pointer;background:var(--pu);color:#fff;display:none;margin:1.1rem auto 0;letter-spacing:.04em;transition:transform .13s;box-shadow:0 4px 20px rgba(155,93,229,.45)}
+.btn-next:hover{transform:scale(1.05)}
+.btn-next:active{transform:scale(.96)}
+
+/* ───── RESULTS ───── */
+#results{display:none;min-height:100vh;padding:2.5rem 1.2rem 4rem}
+.res-inner{display:flex;flex-direction:column;align-items:center;text-align:center;max-width:500px;margin:0 auto}
+.r-tag{display:inline-block;background:var(--yw);color:var(--dark);font-family:'Unbounded',cursive;font-size:.6rem;font-weight:900;letter-spacing:.2em;padding:.4rem 1.3rem;border-radius:999px;margin-bottom:1.2rem}
+.r-title{font-family:'Unbounded',cursive;font-size:clamp(1.7rem,5.5vw,3rem);font-weight:900;line-height:1.08;margin-bottom:.5rem}
+.ring{width:156px;height:156px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:1.6rem auto 1.3rem;box-shadow:0 0 40px rgba(255,60,150,.4);position:relative}
+.ring-inner{width:114px;height:114px;border-radius:50%;background:var(--dark);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1}
+.r-num{font-family:'Unbounded',cursive;font-size:2.5rem;font-weight:900;color:#fff}
+.r-den{font-size:.78rem;color:rgba(255,255,255,.45);font-weight:700}
+.r-msg{color:rgba(255,255,255,.75);font-weight:700;font-size:1rem;max-width:380px;margin:.4rem auto 1.5rem;line-height:1.6}
+.rcats{display:flex;flex-wrap:wrap;gap:.55rem;justify-content:center;margin-bottom:2rem}
+.rcat{font-size:.78rem;font-weight:800;padding:.36rem 1rem;border-radius:999px;border:2px solid}
+.rcat.art{background:rgba(255,122,26,.12);border-color:#FF7A1A;color:#FF7A1A}
+.rcat.lit{background:rgba(255,60,150,.12);border-color:var(--pk);color:var(--pk)}
+.rcat.arch{background:rgba(0,220,255,.12);border-color:var(--cy);color:var(--cy)}
+.rcat.fact{background:rgba(0,200,100,.12);border-color:var(--gr);color:var(--gr)}
+.rcat.kino{background:rgba(155,93,229,.12);border-color:var(--pu);color:var(--pu)}
+.btn-restart{font-family:'Unbounded',cursive;font-size:.82rem;font-weight:900;padding:.85rem 2.5rem;border-radius:999px;border:2.5px solid rgba(255,255,255,.28);cursor:pointer;background:transparent;color:#fff;transition:all .14s;letter-spacing:.04em}
+.btn-restart:hover{background:rgba(255,255,255,.1);transform:scale(1.04)}
+
+/* ───── MUSIC BUTTON ───── */
+#musicBtn{position:fixed;top:14px;right:14px;z-index:100;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);color:#fff;font-family:'Unbounded',cursive;font-size:.62rem;font-weight:900;padding:.45rem .95rem;border-radius:999px;cursor:pointer;transition:background .15s;backdrop-filter:blur(6px)}
+#musicBtn:hover{background:rgba(255,255,255,.22)}
+
+/* ───── BALLOONS CANVAS ───── */
+#balloonCanvas{position:fixed;inset:0;z-index:1;pointer-events:none}
+
+/* ───── FIREWORKS CANVAS ───── */
+#fwCanvas{position:fixed;inset:0;z-index:3;pointer-events:none;display:none}
+
+/* ───── BIRTHDAY CARD ───── */
+.bday-card{background:linear-gradient(135deg,#2D0A4E,#0A1A3E);border:2px solid rgba(255,214,0,.35);border-radius:28px;padding:2.4rem 2rem 2rem;margin-top:2rem;text-align:center;position:relative;overflow:hidden}
+.bday-card::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,214,0,.18) 1px,transparent 1px);background-size:22px 22px;pointer-events:none}
+.bday-hearts{font-size:2rem;margin-bottom:.8rem;display:block}
+.bday-h{font-family:'Unbounded',cursive;font-size:clamp(1.3rem,4vw,2rem);font-weight:900;color:var(--yw);line-height:1.15;margin-bottom:1.1rem}
+.bday-text{color:rgba(255,255,255,.88);font-size:clamp(.9rem,2.2vw,1.05rem);font-weight:700;line-height:1.75;max-width:440px;margin:0 auto 1.4rem}
+.bday-text .hi{color:var(--pk);font-weight:800}
+.bday-text .bl{color:var(--cy);font-weight:800}
+.bday-text .go{color:var(--gr);font-weight:800}
+.bday-sign{font-family:'Unbounded',cursive;font-size:.7rem;color:rgba(255,255,255,.4);letter-spacing:.15em;text-transform:uppercase;margin-top:.5rem}
+
+@media(max-width:490px){
+  .opts{grid-template-columns:1fr}
+  .qcard{padding:1.2rem 1rem 1rem}
+  #splash{padding:2rem .9rem}
+  .bday-card{padding:1.6rem 1.2rem 1.5rem}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<canvas id="balloonCanvas"></canvas>
+<canvas id="fwCanvas"></canvas>
+<button id="musicBtn" onclick="toggleMusic()">🎵 Музыка</button>
+
+<!-- SPLASH -->
+<div id="splash">
+  <span class="s-tag">🎂 С днём рождения!</span>
+  <div class="s-title">
+    <span class="pk">АНЯ,</span><br>
+    <span class="cy">ЭТОТ</span> <span class="yw">КВИЗ</span><br>
+    ДЛЯ ТЕБЯ!
+  </div>
+  <p class="s-sub">Искусство · Русская литература · Архитектура · Правда или фейк · Советское кино</p>
+  <div class="chips">
+    <span class="chip">🎨 5 тем</span>
+    <span class="chip">📝 21 вопрос</span>
+    <span class="chip">💡 Факт после каждого ответа</span>
+  </div>
+  <button class="btn-go" onclick="startQuiz()">НАЧАТЬ КВИЗ →</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz">
+  <div class="scene">
+    <div class="qheader">
+      <span id="qcount">Вопрос 1 из 20</span>
+      <span id="qscore">0 очков</span>
+    </div>
+    <div class="pbar-wrap"><div class="pbar" id="pbar" style="width:0%"></div></div>
+    <div id="qarea"></div>
+    <div style="text-align:center">
+      <button class="btn-next" id="btnNext" onclick="nextQ()">Следующий вопрос →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="results">
+  <div class="scene">
+    <div class="res-inner">
+      <span class="r-tag">🏆 Результаты</span>
+      <div class="r-title" id="rtitle"></div>
+      <div class="ring" id="ring">
+        <div class="ring-inner">
+          <span class="r-num" id="rnum">0</span>
+          <span class="r-den" id="rden">из 20</span>
+        </div>
+      </div>
+      <p class="r-msg" id="rmsg"></p>
+      <div class="rcats" id="rcats"></div>
+      <button class="btn-restart" onclick="restart()">↺ Пройти ещё раз</button>
+
+      <div class="bday-card">
+        <span class="bday-hearts">🎂 🌟 🎉</span>
+        <div class="bday-h">С днём рождения,<br>наша любимая Аня!</div>
+        <p class="bday-text">
+          Тебе <span class="hi">16 лет</span> — и это только начало самого интересного путешествия.<br><br>
+          Ты <span class="hi">умница</span>, которая видит красоту там, где другие проходят мимо.
+          Ты <span class="bl">красавица</span> — и не только снаружи, но и внутри.
+          Ты <span class="go">смелая</span> — потому что выбираешь знания, искусство и настоящее.<br><br>
+          Впереди у тебя — <span class="hi">первые самостоятельные путешествия</span>,
+          <span class="bl">открытия, которые перевернут мир</span>,
+          люди, которые станут лучшими друзьями навсегда,
+          и <span class="go">мечты, которые обязательно сбудутся</span>.<br><br>
+          Расти, удивляй, влюбляйся в жизнь — ты для этого рождена. 💛
+        </p>
+        <div class="bday-sign">с любовью · всегда рядом</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   AUDIO ENGINE  (Web Audio API — no files)
+══════════════════════════════════════════ */
+let actx=null;
+function getACtx(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)();return actx;}
+
+function playCorrect(){
+  const a=getACtx();
+  const freqs=[523,659,784,1047];
+  freqs.forEach((f,i)=>{
+    const o=a.createOscillator(),g=a.createGain();
+    o.connect(g);g.connect(a.destination);
+    o.type='sine';o.frequency.value=f;
+    const t=a.currentTime+i*0.1;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.22,t+.04);
+    g.gain.linearRampToValueAtTime(0,t+.22);
+    o.start(t);o.stop(t+.25);
+  });
+}
+
+function playWrong(){
+  const a=getACtx();
+  const o=a.createOscillator(),g=a.createGain();
+  o.connect(g);g.connect(a.destination);
+  o.type='sawtooth';
+  o.frequency.setValueAtTime(300,a.currentTime);
+  o.frequency.linearRampToValueAtTime(140,a.currentTime+.28);
+  g.gain.setValueAtTime(.18,a.currentTime);
+  g.gain.linearRampToValueAtTime(0,a.currentTime+.35);
+  o.start(a.currentTime);o.stop(a.currentTime+.38);
+}
+
+/* background music — looped happy arp */
+let musicOn=false,musicNodes=[];
+function toggleMusic(){
+  if(musicOn){stopMusic();}else{startMusic();}
+}
+function startMusic(){
+  const a=getACtx();
+  const scale=[261,294,330,349,392,440,494,523];
+  const pattern=[0,2,4,7,4,2,0,2,4,7,4,2];
+  const bpm=144,step=60/bpm;
+  musicNodes=[];
+  pattern.forEach((deg,i)=>{
+    [1,2].forEach(oct=>{
+      const o=a.createOscillator(),g=a.createGain();
+      o.connect(g);g.connect(a.destination);
+      o.type='triangle';
+      o.frequency.value=scale[deg]*(oct===2?2:1);
+      const t=a.currentTime+i*step+(oct-1)*step*pattern.length;
+      g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.06,t+.02);
+      g.gain.linearRampToValueAtTime(0,t+step*.85);
+      o.start(t);o.stop(t+step);
+      musicNodes.push(o);
+    });
+  });
+  musicOn=true;
+  document.getElementById('musicBtn').textContent='🔇 Стоп';
+  /* restart after loop */
+  musicNodes[musicNodes.length-1].onended=()=>{if(musicOn){musicNodes=[];startMusic();}};
+}
+function stopMusic(){
+  musicNodes.forEach(n=>{try{n.stop();}catch(e){}});
+  musicNodes=[];musicOn=false;
+  document.getElementById('musicBtn').textContent='🎵 Музыка';
+}
+
+/* ══════════════════════════════════════════
+   BALLOONS  (canvas, Bézier strings)
+══════════════════════════════════════════ */
+const bCvs=document.getElementById('balloonCanvas');
+const bCtx=bCvs.getContext('2d');
+const BALLOON_COLORS=['#FF3C96','#FFD600','#00DCFF','#9B5DE5','#FF7A1A','#00C864','#FF6B6B','#A8DAFF'];
+let balloons=[];
+
+function resizeBalloons(){
+  bCvs.width=window.innerWidth;
+  bCvs.height=window.innerHeight;
+}
+resizeBalloons();
+window.addEventListener('resize',resizeBalloons);
+
+function makeBalloon(){
+  return{
+    x:Math.random()*window.innerWidth,
+    y:window.innerHeight+80+Math.random()*120,
+    r:28+Math.random()*26,
+    color:BALLOON_COLORS[Math.floor(Math.random()*BALLOON_COLORS.length)],
+    vx:(Math.random()-.5)*.55,
+    vy:-(0.55+Math.random()*.55),
+    sway:Math.random()*Math.PI*2,
+    swaySpeed:.012+Math.random()*.012,
+    stringLen:70+Math.random()*50,
+    cp1x:(Math.random()-.5)*55,
+    cp1y:Math.random()*-40,
+    cp2x:(Math.random()-.5)*55,
+    cp2y:Math.random()*-30,
+  };
+}
+
+for(let i=0;i<14;i++){
+  const b=makeBalloon();
+  b.y=Math.random()*window.innerHeight*1.3+window.innerHeight*.1;
+  balloons.push(b);
+}
+
+function drawBalloon(b){
+  const x=b.x,y=b.y,r=b.r;
+  /* shadow glow */
+  bCtx.save();
+  bCtx.shadowColor=b.color;
+  bCtx.shadowBlur=18;
+  /* body */
+  bCtx.beginPath();
+  bCtx.ellipse(x,y,r,r*1.18,0,0,Math.PI*2);
+  bCtx.fillStyle=b.color;
+  bCtx.fill();
+  /* highlight */
+  bCtx.beginPath();
+  bCtx.ellipse(x-r*.28,y-r*.3,r*.22,r*.14,-0.5,0,Math.PI*2);
+  bCtx.fillStyle='rgba(255,255,255,.45)';
+  bCtx.fill();
+  /* knot */
+  bCtx.beginPath();
+  bCtx.arc(x,y+r*1.18,3.5,0,Math.PI*2);
+  bCtx.fillStyle=b.color;
+  bCtx.fill();
+  bCtx.restore();
+  /* bézier string */
+  const sx=x,sy=y+r*1.22;
+  const ex=x+b.cp1x*2,ey=sy+b.stringLen;
+  bCtx.beginPath();
+  bCtx.moveTo(sx,sy);
+  bCtx.bezierCurveTo(
+    sx+b.cp1x, sy+b.cp1y+b.stringLen*.3,
+    sx+b.cp2x, sy+b.cp2y+b.stringLen*.7,
+    ex, ey
+  );
+  bCtx.strokeStyle='rgba(255,255,255,.45)';
+  bCtx.lineWidth=1.4;
+  bCtx.stroke();
+}
+
+function animBalloons(){
+  bCtx.clearRect(0,0,bCvs.width,bCvs.height);
+  balloons.forEach(b=>{
+    b.sway+=b.swaySpeed;
+    b.x+=b.vx+Math.sin(b.sway)*.4;
+    b.y+=b.vy;
+    if(b.y<-200){
+      Object.assign(b,makeBalloon());
+      b.x=Math.random()*window.innerWidth;
+    }
+    drawBalloon(b);
+  });
+  requestAnimationFrame(animBalloons);
+}
+animBalloons();
+
+/* ══════════════════════════════════════════
+   FIREWORKS  (canvas, shown on results)
+══════════════════════════════════════════ */
+const fCvs=document.getElementById('fwCanvas');
+const fCtx=fCvs.getContext('2d');
+let fwActive=false,particles=[];
+
+function resizeFw(){fCvs.width=window.innerWidth;fCvs.height=window.innerHeight;}
+resizeFw();
+window.addEventListener('resize',resizeFw);
+
+function burst(cx,cy){
+  const colors=['#FF3C96','#FFD600','#00DCFF','#9B5DE5','#FF7A1A','#fff','#00C864'];
+  for(let i=0;i<52;i++){
+    const ang=Math.random()*Math.PI*2;
+    const sp=2.5+Math.random()*5;
+    particles.push({
+      x:cx,y:cy,
+      vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      life:1,decay:.018+Math.random()*.018,
+      r:2.5+Math.random()*2.5
+    });
+  }
+}
+
+function animFw(){
+  if(!fwActive)return;
+  fCtx.fillStyle='rgba(13,7,23,.22)';
+  fCtx.fillRect(0,0,fCvs.width,fCvs.height);
+  particles=particles.filter(p=>p.life>0);
+  particles.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;p.vy+=.07;p.life-=p.decay;
+    fCtx.globalAlpha=Math.max(0,p.life);
+    fCtx.beginPath();
+    fCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    fCtx.fillStyle=p.color;
+    fCtx.fill();
+  });
+  fCtx.globalAlpha=1;
+  requestAnimationFrame(animFw);
+}
+
+function startFireworks(){
+  fwActive=true;fCvs.style.display='block';
+  fCtx.clearRect(0,0,fCvs.width,fCvs.height);
+  let count=0;
+  const iv=setInterval(()=>{
+    burst(
+      fCvs.width*.15+Math.random()*fCvs.width*.7,
+      fCvs.height*.1+Math.random()*fCvs.height*.55
+    );
+    count++;
+    if(count>22)clearInterval(iv);
+  },260);
+  animFw();
+  setTimeout(()=>{fwActive=false;setTimeout(()=>{fCvs.style.display='none';fCtx.clearRect(0,0,fCvs.width,fCvs.height);},800);},7000);
+}
+
+/* ══════════════════════════════════════════
+   QUIZ DATA
+══════════════════════════════════════════ */
+/*
+  ФОТО: все ссылки ведут на Wikimedia Commons формат /640px-…
+  Это JPEG шириной 640px — достаточно для экрана, быстро грузится.
+  CSS делает object-fit:cover + object-position:center 22%
+  чтобы лица и главные объекты не обрезались.
+*/
+const QS = [
+  {
+    cat:"fact", label:"🦒 Бонус-вопрос",
+    q:"Как спят жирафы?",
+    img:"image12.jpg",
+    cap:"Это фото специально для тебя 😉",
+    opts:["Только стоя","Только лёжа","И стоя, и лёжа","Вообще не спят"], ans:2,
+    fact:"Жирафы спят и стоя, и лёжа! Стоя они дремлют короткими урывками по несколько минут. А вот глубокий сон — только лёжа, свернув шею на спине. Но лёжа жираф уязвим, поэтому глубокий сон длится всего 20–30 минут в сутки."
+  },
+  {
+    cat:"art", label:"🎨 Искусство",
+    q:"Кто написал «Девочку с персиками»?",
+    img:"image1.jpg",
+    cap:"Третьяковская галерея, Москва",
+    opts:["Илья Репин","Валентин Серов","Исаак Левитан","Василий Суриков"], ans:1,
+    fact:"Серов написал портрет Веры Мамонтовой в 1887 году в усадьбе Абрамцево — ему было всего 22 года! Работа считается одним из лучших образцов русского импрессионизма."
+  },
+  {
+    cat:"lit", label:"📚 Русская литература",
+    q:"Как зовут главного героя романа «Преступление и наказание»?",
+    opts:["Андрей Болконский","Евгений Онегин","Родион Раскольников","Алексей Карамазов"], ans:2,
+    fact:"Раскольников — бывший студент, убивший старуху-процентщицу. Его имя символично: «раскол» — разрыв с моралью и с собственной душой. Достоевский писал роман почти три года."
+  },
+  {
+    cat:"arch", label:"🏛 Архитектура",
+    q:"В каком году был заложен собор Нотр-Дам де Пари?",
+    img:"image2.jpg",
+    cap:"Île de la Cité, Париж",
+    opts:["1163","1248","1345","1431"], ans:0,
+    fact:"Строительство Нотр-Дама началось в 1163 году при епископе Морисе де Сюлли и завершилось лишь около 1345-го — почти два века! В 2019 году собор пережил страшный пожар, но был восстановлен и вновь открылся в декабре 2024 года."
+  },
+  {
+    cat:"fact", label:"🔍 Правда или фейк?",
+    q:"Лев Толстой был отлучён от православной церкви.",
+    opts:["✅ Правда","❌ Фейк"], ans:0,
+    fact:"Правда! В 1901 году Синод официально отлучил Толстого от церкви за его религиозные взгляды. Писатель открыто критиковал православие и отрицал таинства."
+  },
+  {
+    cat:"kino", label:"🎬 Советское кино",
+    q:"Как зовут главную героиню фильма Гайдая «Кавказская пленница»?",
+    img:"image3.jpg",
+    cap:"Реж. Леонид Гайдай, «Мосфильм», 1967",
+    opts:["Надя","Нина","Таня","Света"], ans:1,
+    fact:"Героиню зовут Нина — студентка-комсомолка, спортсменка и просто красавица! Роль сыграла Наталья Варлей. Фильм собрал 76,5 млн зрителей — рекорд советского проката."
+  },
+  {
+    cat:"art", label:"🎨 Искусство",
+    q:"Как называется эта знаменитая картина Айвазовского?",
+    img:"image4.jpg",
+    cap:"Русский музей, Санкт-Петербург, 1850",
+    opts:["«Буря на Чёрном море»","«Девятый вал»","«Волна»","«После шторма»"], ans:1,
+    fact:"«Девятый вал» (1850) — самая известная картина Айвазовского. По морской легенде, именно девятая волна — самая страшная и мощная в любой буре."
+  },
+  {
+    cat:"lit", label:"📚 Русская литература",
+    q:"Кто написал стихотворение «Я памятник себе воздвиг нерукотворный...»?",
+    opts:["Михаил Лермонтов","Фёдор Тютчев","Николай Некрасов","Александр Пушкин"], ans:3,
+    fact:"«Памятник» написан Пушкиным в 1836 году — за несколько месяцев до его гибели на дуэли. Это переосмысление знаменитой оды римского поэта Горация."
+  },
+  {
+    cat:"arch", label:"🏛 Архитектура",
+    q:"В каком стиле построены московские «сталинские высотки»?",
+    img:"image5.jpg",
+    cap:"МГУ — одна из семи «сестёр»",
+    opts:["Конструктивизм","Сталинский ампир","Русский модерн","Функционализм"], ans:1,
+    fact:"Семь «сталинских сестёр» строили в 1947–1957 гг. Стиль сочетает советскую монументальность с элементами ар-деко. Самая высокая — МГУ (240 м)."
+  },
+  {
+    cat:"fact", label:"🔍 Правда или фейк?",
+    q:"Антон Чехов всю жизнь совмещал писательство с работой врача.",
+    opts:["✅ Правда","❌ Фейк"], ans:0,
+    fact:"Правда! Чехов говорил: «Медицина — моя законная жена, а литература — любовница». Он лечил крестьян бесплатно и умер от туберкулёза в 44 года."
+  },
+  {
+    cat:"kino", label:"🎬 Советское кино",
+    q:"Как зовут изобретателя машины времени в фильме «Иван Васильевич меняет профессию»?",
+    img:"image6.jpg",
+    cap:"Реж. Леонид Гайдай, 1973",
+    opts:["Александр Тимофеев","Иван Петров","Семён Горбунков","Фёдор Дынин"], ans:0,
+    fact:"Изобретателя зовут Шурик — Александр Тимофеев. Фильм снят по пьесе Булгакова «Иван Васильевич». Гайдай и Булгаков — идеальный союз!"
+  },
+  {
+    cat:"art", label:"🎨 Искусство",
+    q:"Кто в действительности нарисовал медведей на картине «Утро в сосновом лесу»?",
+    img:"image7.jpg",
+    cap:"Третьяковская галерея",
+    opts:["Только Шишкин","Только Савицкий","Шишкин — лес, Савицкий — медведи","Репин добавил медведей позже"], ans:2,
+    fact:"Лес написал Шишкин, а медведей — Савицкий. Когда Третьяков купил картину, он стёр подпись Савицкого — так соавтор остался в тени истории!"
+  },
+  {
+    cat:"lit", label:"📚 Русская литература",
+    q:"В каком городе происходят современные главы «Мастера и Маргариты»?",
+    opts:["Петербург","Киев","Одесса","Москва"], ans:3,
+    fact:"Воланд и его свита приезжают в Москву 1930-х годов. Булгаков писал роман 12 лет вплоть до своей смерти и так и не успел его завершить."
+  },
+  {
+    cat:"arch", label:"🏛 Архитектура",
+    q:"Как называется стиль с плавными линиями и природными мотивами, расцветший в России на рубеже XIX–XX вв.?",
+    img:"image8.jpg",
+    cap:"Ярославский вокзал — арх. Фёдор Шехтель",
+    opts:["Барокко","Эклектика","Русский модерн","Рококо"], ans:2,
+    fact:"Русский модерн (ар-нуво) — органические формы, растительный орнамент, витражи. Главный мастер стиля — Фёдор Шехтель: Ярославский вокзал, особняк Рябушинского."
+  },
+  {
+    cat:"fact", label:"🔍 Правда или фейк?",
+    q:"Николай Гоголь сжёг рукопись второго тома «Мёртвых душ».",
+    opts:["✅ Правда","❌ Фейк"], ans:0,
+    fact:"Правда! В феврале 1852 года, незадолго до смерти, Гоголь сжёг почти готовый второй том. Сохранились лишь несколько черновых глав — это одна из главных загадок русской литературы."
+  },
+  {
+    cat:"kino", label:"🎬 Советское кино",
+    q:"В каком советском фильме звучит фраза «Кто к нам с мечом придёт — от меча и погибнет»?",
+    img:"image9.jpg",
+    cap:"Реж. Сергей Эйзенштейн, 1938",
+    opts:["«Иван Грозный»","«Броненосец Потёмкин»","«Александр Невский»","«Война и мир»"], ans:2,
+    fact:"Фраза из «Александра Невского» (1938) Эйзенштейна. Любопытно, что её придумали сценаристы — в исторических источниках она не встречается, но стала крылатой на века."
+  },
+  {
+    cat:"art", label:"🎨 Искусство",
+    q:"Кто создал «Чёрный квадрат» и придумал супрематизм?",
+    img:"image10.jpg",
+    cap:"1915 г., Третьяковская галерея",
+    opts:["Василий Кандинский","Александр Родченко","Марк Шагал","Казимир Малевич"], ans:3,
+    fact:"Малевич написал «Чёрный квадрат» в 1915 году. Рентген картины обнаружил под ним два скрытых изображения и загадочную надпись — её содержание до сих пор изучают."
+  },
+  {
+    cat:"lit", label:"📚 Русская литература",
+    q:"Кто написал поэму «Мёртвые души»?",
+    opts:["Лев Толстой","Иван Тургенев","Николай Гоголь","Александр Пушкин"], ans:2,
+    fact:"«Мёртвые души» (1842) — о помещике Чичикове, скупающем умерших крепостных, чтобы заложить их как живых и получить деньги. Гениальная афера и великий роман одновременно."
+  },
+  {
+    cat:"fact", label:"🔍 Правда или фейк?",
+    q:"В Санкт-Петербурге есть канал, названный в честь писателя Грибоедова.",
+    opts:["✅ Правда","❌ Фейк"], ans:0,
+    fact:"Правда! Екатерининский канал переименовали в 1923 году в честь Александра Грибоедова — автора «Горя от ума», долго жившего неподалёку."
+  },
+  {
+    cat:"kino", label:"🎬 Советское кино",
+    q:"В каком году вышел мультфильм «Крокодил Гена» студии «Союзмультфильм»?",
+    opts:["1966","1969","1972","1975"], ans:1,
+    fact:"«Крокодил Гена» вышел в 1969 году, режиссёр Роман Качанов. Образ Чебурашки придумал Эдуард Успенский — по его словам, это зверёк, который «чебурахнулся», то есть упал."
+  },
+  {
+    cat:"arch", label:"🏛 Архитектура",
+    q:"Как называется зимняя резиденция российских императоров в Санкт-Петербурге?",
+    img:"image11.jpg",
+    cap:"Дворцовая площадь, Санкт-Петербург",
+    opts:["Петропавловская крепость","Таврический дворец","Михайловский замок","Зимний дворец"], ans:3,
+    fact:"Зимний дворец (1762) — шедевр Растрелли в стиле барокко. Сегодня это главный корпус Эрмитажа, где хранится более 3 миллионов предметов искусства."
+  }
+];
+
+const LTRS = ['А','Б','В','Г'];
+const CAT_NAMES = {art:'Искусство',lit:'Литература',arch:'Архитектура',fact:'Правда/фейк',kino:'Советское кино'};
+let cur=0, score=0, answered=false;
+let catS={art:0,lit:0,arch:0,fact:0,kino:0};
+let catT={art:0,lit:0,arch:0,fact:0,kino:0};
+
+function startQuiz(){
+  cur=0; score=0; answered=false;
+  catS={art:0,lit:0,arch:0,fact:0,kino:0};
+  catT={art:0,lit:0,arch:0,fact:0,kino:0};
+  document.getElementById('splash').style.display='none';
+  document.getElementById('quiz').style.display='block';
+  document.getElementById('results').style.display='none';
+  renderQ();
+}
+
+function renderQ(){
+  answered=false;
+  const q=QS[cur], n=QS.length;
+  document.getElementById('qcount').textContent=`Вопрос ${cur+1} из ${n}`;
+  document.getElementById('qscore').textContent=`${score} очков`;
+  document.getElementById('pbar').style.width=`${Math.round(cur/n*100)}%`;
+  document.getElementById('btnNext').style.display='none';
+  const imgH=q.img
+    ?`<div class="img-box"><img src="${q.img}" alt="" loading="lazy"><div class="img-cap">${q.cap||''}</div></div>`
+    :'';
+  const optsH=q.opts.map((o,i)=>`
+    <button class="opt" id="o${i}" onclick="pick(${i})">
+      <span class="olbl">${LTRS[i]}</span><span>${o}</span>
+    </button>`).join('');
+  document.getElementById('qarea').innerHTML=`
+    <div class="qcard">
+      <span class="cpill ${q.cat}">${q.label}</span>
+      ${imgH}
+      <div class="qtxt">${q.q}</div>
+      <div class="opts">${optsH}</div>
+      <div class="fb" id="fb"></div>
+    </div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function pick(i){
+  if(answered)return;
+  answered=true;
+  const q=QS[cur];
+  const ok=(i===q.ans);
+  catT[q.cat]++;
+  if(ok){score++;catS[q.cat]++;}
+  q.opts.forEach((_,j)=>{
+    const b=document.getElementById(`o${j}`);
+    b.disabled=true;
+    if(j===q.ans)b.classList.add('ok');
+    else if(j===i&&!ok)b.classList.add('bad');
+  });
+  const fb=document.getElementById('fb');
+  fb.style.display='block';
+  if(ok){
+    playCorrect();
+    fb.className='fb ok';
+    fb.innerHTML=`✅ Верно! <span style="font-weight:600">${q.fact}</span>`;
+  } else {
+    playWrong();
+    fb.className='fb bad';
+    fb.innerHTML=`❌ Не совсем. Правильный ответ: <strong>${q.opts[q.ans]}</strong><br><span style="font-weight:600">${q.fact}</span>`;
+  }
+  document.getElementById('qscore').textContent=`${score} очков`;
+  const btn=document.getElementById('btnNext');
+  btn.style.display='block';
+  btn.textContent=cur<QS.length-1?'Следующий вопрос →':'Посмотреть результаты 🏆';
+}
+
+function nextQ(){
+  cur++;
+  if(cur>=QS.length){showResults();return;}
+  renderQ();
+}
+
+function showResults(){
+  document.getElementById('quiz').style.display='none';
+  document.getElementById('results').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+  startFireworks();
+  const n=QS.length;
+  const pct=Math.round(score/n*100);
+  const deg=Math.round(pct/100*360);
+  document.getElementById('ring').style.background=
+    `conic-gradient(var(--pk) 0deg, var(--cy) ${deg}deg, rgba(255,255,255,.1) ${deg}deg)`;
+  document.getElementById('rnum').textContent=score;
+  document.getElementById('rden').textContent=`из ${n}`;
+  let title,msg;
+  if(pct===100){title='ИДЕАЛЬНО!';msg='Аня, ты просто блестяще! Все 20 вопросов — верно. Ты настоящий знаток культуры!';}
+  else if(pct>=85){title='ВЕЛИКОЛЕПНО!';msg='Отличный результат! Ты отлично знаешь искусство, литературу и кино — впечатляет!';}
+  else if(pct>=65){title='МОЛОДЕЦ!';msg='Хороший результат! Немного не хватило до идеала — но ты явно разбираешься в теме!';}
+  else if(pct>=45){title='НЕПЛОХО!';msg='Середина — это только начало! Теперь ты знаешь больше, чем до квиза.';}
+  else{title='В СЛЕДУЮЩИЙ РАЗ!';msg='Квиз сложный, не расстраивайся! Теперь у тебя есть новые знания — попробуй ещё раз!';}
+  document.getElementById('rtitle').textContent=title;
+  document.getElementById('rmsg').textContent=msg;
+  const cats=document.getElementById('rcats');
+  cats.innerHTML='';
+  ['art','lit','arch','fact','kino'].forEach(c=>{
+    if(!catT[c])return;
+    const sp=document.createElement('span');
+    sp.className=`rcat ${c}`;
+    sp.textContent=`${CAT_NAMES[c]}: ${catS[c]}/${catT[c]}`;
+    cats.appendChild(sp);
+  });
+}
+
+function restart(){
+  document.getElementById('results').style.display='none';
+  document.getElementById('splash').style.display='flex';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
